@@ -2,9 +2,9 @@
      export __main	 
 	 ENTRY 
 __main  function
-	          MOV r0 , #20   ;first number
-	          MOV r1 , #36    ;second number
-              MOV r2 , #10 	  ;third number  			  
+	          MOV r0 , #27   ;first number
+	          MOV r1 , #56    ;second number
+              MOV r2 , #16 	  ;third number  			  
               CMP r0 , r1
               IT HI
               MOVHI r1 , r0   ;if value in r0>r1, move value in r0 to r1 
