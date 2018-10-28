@@ -1,0 +1,5 @@
+When the given CODE-1 is run in the Keil simulator we get 4 errors in the if-then-else part of the code.
+The 4 errors are due to the fact that in the ITTTE instruction, we have 3 "then" conditions and 1 "else" condition, so, the conditions are missing the proper suffix after the MOV instructions.
+So, for the first 3 MOV instructions which come under the "then" part must be replaced by MOVLT.
+Now, as for the "else" part, it must be opposite of the "then" condition, so the 4th MOV is replace by MOVGE as GE is the opposite of LT. 
+Also, in CODE-2, we can see the 3 instructions under "then" have the suffix LT after the instructions, i.e. ADDLT, MOVLT and MOVLT, whereas, the 4th one i.e. the "else" part has the instruction SUBGE, GE being opposite of LT. Hence, CODE-2 doesn't show any errors. 
