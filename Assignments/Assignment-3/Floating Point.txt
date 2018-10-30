@@ -1,0 +1,25 @@
+1)	Yes.
+The fractional part plays role in defining the precision of a number. 
+Number precision is defined as the maximum number of digits/bits present in a number. The mantissa/significand is composed of an implicit (meaning no need to store it) leading bit (left of radix point) and the fraction bits (to the right of radix point).
+For example, we have a number which is represented as
+1.121 * 10^3(1101). Now,
+Mantissa - 1.121 
+implicit leading bit - 1 
+fraction bits - .121
+Precision - 4 (containing 4 bits i.e. one leading bit and three fraction bits). 
+Precision is important to avoid loss of information.
+
+
+	2) For binary numbers, in single precision floating point, we generally represent a number as (-1)^s*1.m*(2)^e  so, this number with the leading 1 in the mantissa i.e. 1.m is called a normalized number.  The minimum being say, (-1)^s*1.m*(2)^emin.
+So, a subnormal number is a number which are smaller than this which can be represented, but without a leading 1 in the mantissa.
+ These numbers are represented as  (-1)^s*0.m*(2)^e. Here, the precision decreases as the number of leading zeroes increase in the mantissa.
+
+< Normal Numbers >| < Subnormals > | < Subnormals > | < Normal Numbers >
+                       
+     (-1)*1.m*(2)^emin              0             1*1.m*(2)^emin                             
+                   Number line representation
+
+
+
+
+3)The first two methods defined by IEEE round to the nearest value and the remaining 3 methods are called direct rounding. 
