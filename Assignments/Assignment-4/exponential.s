@@ -1,26 +1,25 @@
-     PRESERVE8
-     THUMB
-     AREA     appcode, CODE, READONLY
-     EXPORT __main
-	   ENTRY 
-__main  FUNCTION
-
-    VMOV.F32 S1, #4;x-Number to find e^x
-    VMOV.F32 S2, #15;Number of terms been considered in e^x expansion
-    VMOV.F32 S3, #1;count
-    VMOV.F32 S4, #1; temp
-    VMOV.F32 S5, #1; result
-    VMOV.F32 S7, #1;register to hold one
-  Loop 
-	 VCMP.F32 S2, S3;Comparison done for excuting taylor series expansion of e^x for s2 number of terms
-	 VMRS.F32 APSR_nzcv,FPSCR;Used to copy fpscr to apsr
-	 BLT stop;
-	 VDIV.F32 S6, S1, S3; temp1=x/count
-	 VMUL.F32 S4, S4, S6; temp=temp*temp1;
-	 VADD.F32 S5, S5, S4; result=result+temp;
-	 VADD.F32 S3, S3, S7; incrementing count
-	 B Loop; 
-	 
-stop B stop ; stop program
-	 ENDFUNC
-	 END
+   ;PRESERVE8
+   ;thumb
+		area appcode, CODE, READONLY
+		export __main
+		ENTRY
+__main function
+ 
+        MOV R0,#15			;Holding the Number of Terms in Series 'n' 
+        MOV R1,#1			;Counting Variable 'i' 
+        VLDR.F32 S0,=1		;Holding the sum of series elements 's' 
+        VLDR.F32 S1,=1		;Temp Variable to hold the intermediate series elements 't' 
+        VLDR.F32 S2,=4		;Holding 'x' Value 
+LOOP1    CMP R1,R0			;Compare 'i' and 'n'  
+        BLE LOOP			;if i < n goto LOOP 
+        B stop				;else goto stop 
+LOOP   VMUL.F32 S1,S1,S2	; t = t*x 
+        VMOV.F32 S5,R1		;Moving the bit stream in R1('i') to S5(floating point register) 
+        VCVT.F32.U32 S5,S5	;Converting the bitstream into unsigned fp Number 32 bit 
+        VDIV.F32 S1,S1,S5	;Divide t by 'i' and store it back in 't' 
+        VADD.F32 S0,S0,S1	;Finally add 's' to 't' and store it in 's' 
+        ADD R1,R1,#1		;Increment the counter variable 'i' 
+        B LOOP1				;Again goto comparision 
+stop    B stop 
+        ENDFUNC 
+        END
