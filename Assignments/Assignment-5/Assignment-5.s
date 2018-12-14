@@ -1,14 +1,18 @@
-   AREA     appcode, CODE, READONLY
+  AREA     appcode, CODE, READONLY
      export __main	 
-     IMPORT printMsg		 
+     IMPORT printmsg		 
+     IMPORT print_table	 		 
 	 ENTRY 
 __main  function	
 	      VLDR.F32 s0 , =1 ;X0 DATA
           VLDR.F32 s1 , =1 ;X1 DATA
-          VLDR.F32 s2 , =1 ;X2 DATA		  
-          ADR.W r0 , BranchTable_Byte
-		  MOV r1 , #0                   ;r1 will take number to select logic .0-Nand ,1-Nor like that
-		  TBB [r0 , r1 ]
+          VLDR.F32 s2 , =1 ;X2 DATA	
+	  MOV R9 ,#0		
+          MOV R7 ,#0 
+          MOV R12,#0		  
+startagain 		            ADR.W r0 , BranchTable_Byte
+		                   MOV r1 , R12                   ;r1 will take number to select logic .0-Nand ,1-Nor like that
+		                   TBB [r0 , r1 ]
 NAND_LOGIC         VLDR.F32 s28 ,=0.6 	;WEIGHT W1   
 		           VLDR.F32 s29 ,=-0.8  ;WEIGHT W2   
                    VLDR.F32	s30 ,=-0.8 	;WEIGHT W3
@@ -46,8 +50,7 @@ XNOR_LOGIC        VLDR.F32 s28 ,=-5 	;WEIGHT W1
                   VLDR.F32 s31 ,=1   ;BIAS   
                    B  X_CALCULATION
 
-NOT_LOGIC         VLDR.F32 s2 , =0
-                  VLDR.F32 s28 ,=0.5 	;WEIGHT W1   
+NOT_LOGIC         VLDR.F32 s28 ,=0.5 	;WEIGHT W1   
 		          VLDR.F32 s29 ,=-0.7  ;WEIGHT W2   
                   VLDR.F32	s30 ,=0 	;WEIGHT W3
                   VLDR.F32 s31 ,=0.1   ;BIAS   
@@ -140,6 +143,10 @@ STOP		   VLDR s0 ,[r0]  ; stop program
 
 
 OUTPUT     VLDR.F32 s16 , =0.5
+		   MOV R5 ,#0X20000000
+		   VSTR S3 ,[R5]
+		   LDR R0 ,[R5]
+		   BL printMsg
            VCMP.F32     s3 , s16  
            VMRS r1 , FPSCR                    ;output is kept  in r0 .LOGIC LSL AND CMP ARE APPLIED ON FPSR FLAGS WHOOSE VALUE IS IN R1
            MOV r2 , #1
@@ -149,7 +156,42 @@ OUTPUT     VLDR.F32 s16 , =0.5
 		   ITE  HI
 		   MOVHI r0 , #0
 		   MOVLS r0 , #1
-		   BL printMsg
-stop       B   stop		   
+           LSL R7 , R7 ,#1
+		   ORR R7 , R7 ,R0
+		  ADR.W r8 , Table_Byte		  
+		  TBB [r8 , r9 ]		  		  
+input2    VLDR.F32 s0 , =1 ;X0 DATA
+          VLDR.F32 s1 , =0 ;X1 DATA
+          VLDR.F32 s2 , =1 ;X2 DATA
+          ADD r9 , r9 , #1                   ;r1 will take number to select logic .0-Nand ,1-Nor like that		  
+		  B startagain
+		  
+input3    VLDR.F32 s0 , =1 ;X0 DATA
+          VLDR.F32 s1 , =1 ;X1 DATA
+          VLDR.F32 s2 , =0 ;X2 DATA		  
+		  ADD r9 , r9 , #1                   ;r1 will take number to select logic .0-Nand ,1-Nor like that
+		  B startagain
+		  
+input4    VLDR.F32 s0 , =1 ;X0 DATA
+          VLDR.F32 s1 , =1 ;X1 DATA
+          VLDR.F32 s2 , =1 ;X2 DATA
+		  ADD r9 , r9 , #1                   ;r1 will take number to select logic .0-Nand ,1-Nor like that
+          B startagain
+
+
+stop            MOV R0 , R7
+                MOV R7 ,#0	
+                BL Printtruthtable
+				CMP R12 ,#6
+				IT HI
+				BHI stop1
+				ADD R12 ,R12 ,#1
+				B startagain
+stop1           B   stop1	
+Table_Byte		  
+    DCB   0		  
+    DCB   ((input3-input2)/2)	
+	DCB   ((input4-input2)/2)	
+	DCB   ((stop-input2)/2)   
         endfunc
       end
